@@ -4,7 +4,7 @@ import sys
 import os
 
 sys.path.append(os.path.dirname(__file__))
-from utils.calcul_electric import genereaza_bom, calcul_module, selectie_cutie
+from utils.calcul_electric import genereaza_bom, calcul_module, selectie_cutie, REZERVA_PROCENT
 
 st.set_page_config(
     page_title="Configurator Tablou Electric",
@@ -109,7 +109,7 @@ with col_u2:
     )
 
 with col_u3:
-    contor_energie = st.checkbox("Contor de energie")
+    pass
 
 st.divider()
 
@@ -126,18 +126,18 @@ if st.button("Generează lista de materiale", type="primary"):
         "speciali": speciali,
         "spd": spd,
         "releu_tensiune": releu_tensiune,
-        "contor_energie": contor_energie,
     }
 
     bom = genereaza_bom(config)
-    nr_module = calcul_module(bom, tip_mcb)
-    cutie = selectie_cutie(nr_module)
+    module_utilizate, rezerva, module_total = calcul_module(bom)
+    cutie = selectie_cutie(module_total)
 
     # Sumar tablou
-    col_s1, col_s2, col_s3 = st.columns(3)
+    col_s1, col_s2, col_s3, col_s4 = st.columns(4)
     col_s1.metric("Alimentare", alimentare)
-    col_s2.metric("Module necesare", nr_module)
-    col_s3.metric("Cutie recomandată", cutie)
+    col_s2.metric("Module utilizate", module_utilizate)
+    col_s3.metric(f"Rezervă {int(REZERVA_PROCENT*100)}% (I7)", rezerva)
+    col_s4.metric("Cutie recomandată", cutie)
 
     st.subheader("Lista de materiale")
     df = pd.DataFrame(bom)
