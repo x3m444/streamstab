@@ -40,19 +40,48 @@ with col5:
     nr_prize = st.number_input("Nr. circuite prize", min_value=0, max_value=20, value=4, step=1)
 
 # ─── Consumatori speciali ──────────────────────────────────────────────────────
+CONSUMATORI_PREDEFINITI = {
+    "Boiler electric":              2000,
+    "Aparat aer condiționat":       1500,
+    "Mașină de spălat":             2200,
+    "Uscător de rufe":              2500,
+    "Mașină de spălat vase":        1800,
+    "Cuptor electric":              3500,
+    "Plită electrică":              7000,
+    "Pompă piscină / hidrofor":     1100,
+    "Încălzire electrică":          2000,
+    "Stație încărcare VE (wallbox)": 7400,
+    "Altul...":                     1000,
+}
+
 st.subheader("Consumatori speciali")
 nr_speciali = st.number_input("Câți consumatori speciali?", min_value=0, max_value=10, value=0, step=1)
 
 speciali = []
 if nr_speciali > 0:
     for i in range(int(nr_speciali)):
-        c1, c2, c3 = st.columns([2, 1, 1])
+        c1, c2, c3, c4 = st.columns([2, 1, 1, 1])
         with c1:
-            denumire = st.text_input(f"Denumire #{i+1}", value="Boiler", key=f"den_{i}")
+            tip = st.selectbox(
+                f"Tip consumator #{i+1}",
+                list(CONSUMATORI_PREDEFINITI.keys()),
+                key=f"tip_{i}"
+            )
         with c2:
-            putere = st.number_input(f"Putere (W) #{i+1}", min_value=100, max_value=20000,
-                                      value=2000, step=100, key=f"put_{i}")
+            putere_default = CONSUMATORI_PREDEFINITI[tip]
+            putere = st.number_input(
+                f"Putere (W) #{i+1}",
+                min_value=100, max_value=20000,
+                value=putere_default, step=100,
+                key=f"put_{i}"
+            )
         with c3:
+            if tip == "Altul...":
+                denumire = st.text_input(f"Denumire #{i+1}", value="Consumator", key=f"den_{i}")
+            else:
+                denumire = tip
+                st.text_input(f"Denumire #{i+1}", value=tip, disabled=True, key=f"den_{i}")
+        with c4:
             trifazat_c = False
             if alimentare == "Trifazat":
                 trifazat_c = st.checkbox(f"Trifazat #{i+1}", key=f"tri_{i}")
